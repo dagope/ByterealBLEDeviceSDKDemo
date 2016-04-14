@@ -1,0 +1,2 @@
+# ByterealBLEDeviceSDKDemo
+具体说明请看sdk说明文档：ByterealDeviceScanSDK.doc
