@@ -21,6 +21,7 @@ public class RegisteredBroadcast {
         intentFilter.addAction("android.bluetooth.adapter.action.STATE_CHANGED");
         bluetoothBroadcastReceiver = new BluetoothBroadcastReceiver();
         context.registerReceiver(bluetoothBroadcastReceiver, intentFilter);
+
         ILOG("broadcastreceiver registered!");
     }
 

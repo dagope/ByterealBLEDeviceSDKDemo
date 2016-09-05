@@ -22,7 +22,8 @@ public class IBeaconScanTask {
     public void stopIBeaconScan(Context context) {
         this.bluetoothAdapter.stopLeScan(this.scanCallback);
         updataCacheList();
-        IBeaconScanConfig.newIBeaconCallback.endOfTheScan();
+        if(IBeaconScanConfig.newIBeaconCallback != null)
+            IBeaconScanConfig.newIBeaconCallback.endOfTheScan();
     }
 
 

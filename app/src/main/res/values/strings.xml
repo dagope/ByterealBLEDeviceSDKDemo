@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">ByterealSDKDemo</string>
+
+    <string name="permissions_rationale_toInitApp">Esta concesión debe hacerse al iniciar la app.\n\nMuchas gracias,\nTikate Team.</string>
+    <string name="permissions_rationale_messageOfList">Hola!\nAntes de hacer uso de esta aplicación, primero tenemos que pedirte que nos concedas estos permisos para poder funcionar:</string>
+    <string name="permissions_location_rationale">Necesitamos acceder a los datos de GPS y proximidad para el proceso de localización. Sin ello no podremos posicionarte en el mapa.</string>
+    <string name="permissions_location_denied">Es necesario acceder a tu ubicación para mostrar tu posición en el mapa.</string>
+    <string name="permissions_readPhoneState_rationale">Necesitamos identificar tu teléfono para poder situarte en el mapa.</string>
+    <string name="permissions_readPhoneState_denied">Sin permisos para leer la identificación de tu teléfono no podrás utilizar esta app.</string>
+    <string name="permissions_getAccounts_rationale">Los permisos para tus cuentas es únicamente para que puedas recibir notificaciones push de emergencia.</string>
+    <string name="permissions_getAccounts_denied">Sin permisos para tus cuentas no recibirá notificaciones de emergencia.</string>
+
+    <string name="need_google_play_services">Esta aplicación no es compatible si no tienes instalados GooglePlayServices.</string>
+    <string name="permissions_not_grant">Vaya :( \nLo sentimos, sin los permisos necesarios no podemos funcionar. Esperamos verte de nuevo cuando cambies de opinión.\n\nUn saludo,\nTikate Team</string>
+    <string name="ok_button_showMessage">OK</string>
+    <string name="cancel_button_showMessage">Cancelar</string>
+    <string name="no_and_exit_button_showMessage">No, y salir</string>
+    <string name="exit_button_showMessage">Salir</string>
+    <string name="go_to_playStore_showMessage">Ir a play Store</string>
+
+
 </resources>

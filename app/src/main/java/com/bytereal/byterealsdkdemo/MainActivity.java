@@ -1,50 +1,139 @@
 package com.bytereal.byterealsdkdemo;
 
+import android.Manifest;
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.bytereal.byterealblesdk.broadcast.receiver.BluetoothBroadcastReceiver;
 import com.bytereal.byterealblesdk.broadcast.register.RegisteredBroadcast;
 import com.bytereal.byterealblesdk.service.IBeacon;
 import com.bytereal.byterealblesdk.service.IBeaconScanConfig;
+import com.bytereal.byterealblesdk.service.IBeaconScanService;
 import com.bytereal.byterealblesdk.service.IBeaconScanTask;
 
 
 public class MainActivity extends AppCompatActivity implements IBeaconScanTask.NewIBeaconCallback {
 
     private static final String TAG = "MainActivity";
+    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
+    private static final int CODE_PERMISSIONS_GROUP = 1;
+    TextView tvLog;
+
+    Context context = null;
+    Intent serviceBL = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        init();
+        context = getApplicationContext();
+        tvLog = (TextView) findViewById(R.id.tvLog);
+        serviceBL = new Intent(this.context, IBeaconScanService.class);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+
+        if(AppPermissions.checkAllPermissions(getApplicationContext())){
+            InitializeApp();
+        }
+        else{
+            //grantPermissions();
+            if(AppPermissions.shouldShowAnyRequestPermisions(this, AppPermissions.permissionsApp)){
+                //mostramos mensaje de permisos
+                AppPermissions.showDialogAllRequestPermissions(this, AppPermissions.permissionsApp, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //solicitamos los permisos
+                        AppPermissions.requirePermissions(MainActivity.this, AppPermissions.permissionsApp, CODE_PERMISSIONS_GROUP);
+                    }
+                });
+            }
+            else{
+                //solicitamos los permisos
+                AppPermissions.requirePermissions(MainActivity.this, AppPermissions.permissionsApp, CODE_PERMISSIONS_GROUP);
+            }
+        }
+
+
     }
 
-    private void init() {
-        // 设置回调接口
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_COARSE_LOCATION: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "coarse location permission granted");
+                } else {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Functionality limited");
+                    builder.setMessage("Since location access has not been granted, this app will not be able to discover beacons when in the background.");
+                    builder.setPositiveButton(android.R.string.ok, null);
+                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                        }
+
+                    });
+                    builder.show();
+                }
+                return;
+            }
+        }
+    }
+
+
+    private void InitializeApp() {
+        // Set callback interface
         IBeaconScanConfig.newIBeaconCallback = this;
-// 设置信号丢失时长,超过该时长没有再次发现设备,判定为信号丢失
-// 默认为15秒
-// 建议(扫描+间隔)*3.即,连续三次没有发现设备信号才认为丢失
+// Set signal loss longer than the length of the device is not found again, determined to be signal loss
+// Default is 15 seconds
+// Recommendation (scanning + interval) * 3. That is, three times did not find the device that the signal was lost
         IBeaconScanConfig.scanCacheDurationTime = 15000;
-// 扫描时长,默认为3秒.请根据实际需求和电量消耗考虑
+// Scan length, the default is 3 seconds. Please consider the actual demand and consumption of electricity
         IBeaconScanConfig.scanDurationTime = 3000;
-// 扫描间隔,默认为2秒.请根据实际需求和电量消耗考虑
+// Scan interval, the default is 2 seconds. Please consider the actual demand and consumption of electricity
         IBeaconScanConfig.scanSpacingTime = 2000;
-// 请在这里注册蓝牙状态监听广播,请注意顺序,一定先开启广播后开启蓝牙
-// 请在这里开启蓝牙,然后SDK会开启BLE扫描服务
-        RegisteredBroadcast.registeredBluetoothBroadcast(this);
+        // After Register here Bluetooth status listen to the broadcast, please note the order, be sure to turn on Bluetooth Radio Open
+// Here please turn on Bluetooth, then SDK will open BLE Scan Service
+        RegisteredBroadcast.registeredBluetoothBroadcast(this.context);
+        this.context.startService(this.serviceBL);
     }
 
     @Override
     public void findNewIBeacon(IBeacon paramIBeacon) {
+        writeLogView(paramIBeacon);
         Log.i(TAG, paramIBeacon.toString());
+    }
+
+    private void CalculateDistance(IBeacon beacon){
+
     }
 
     @Override
     public void endOfTheScan() {
+        writeLogView("scan stopped!!take time to do what u want to");
+        writeLogView("devices are " + IBeaconScanConfig.IBeaconListCache.toString());
         Log.w(TAG, "scan stopped!!take time to do what u want to");
         Log.w(TAG, "devices are " + IBeaconScanConfig.IBeaconListCache.toString());
     }
@@ -53,11 +142,40 @@ public class MainActivity extends AppCompatActivity implements IBeaconScanTask.N
     protected void onPause() {
         super.onPause();
         RegisteredBroadcast.unRegisterBluetoothBroadcast(this);
+        context.stopService(this.serviceBL);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         BluetoothBroadcastReceiver.unBindService();
+        context.stopService(this.serviceBL);
+    }
+
+    private void writeLogView(final IBeacon beacon){
+
+        String msg = "";
+        msg += "UIID: " + beacon.getUuid();
+        msg += " | : " + beacon.getMajor();
+        msg += "-: " + beacon.getMinor();
+        msg += " | RssI: " + beacon.getRssi();
+        msg += " | TX: " + beacon.getTransmittingPower();
+
+
+
+        writeLogView(msg);
+    }
+
+    private void writeLogView(final String msg){
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                tvLog.setText(tvLog.getText()+ "\n\n- "+ msg);
+            }
+        });
+
+
     }
 }
+
