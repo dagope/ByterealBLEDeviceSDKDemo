@@ -26,8 +26,10 @@ public class RegisteredBroadcast {
     }
 
     public static void unRegisterBluetoothBroadcast(Context context) {
-        context.unregisterReceiver(bluetoothBroadcastReceiver);
-        ILOG("broadcastreceiver unregistered!");
+        if(bluetoothBroadcastReceiver != null){
+            context.unregisterReceiver(bluetoothBroadcastReceiver);
+            ILOG("broadcastreceiver unregistered!");
+        }
 
     }
 }

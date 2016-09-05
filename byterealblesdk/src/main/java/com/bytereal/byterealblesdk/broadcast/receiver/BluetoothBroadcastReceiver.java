@@ -26,7 +26,9 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver {
     }
 
     public static void unBindService() {
-        Intent stopIntent = new Intent(context, IBeaconScanService.class);
-        context.stopService(stopIntent);
+        if(context != null){
+            Intent stopIntent = new Intent(context, IBeaconScanService.class);
+            context.stopService(stopIntent);
+        }
     }
 }

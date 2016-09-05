@@ -40,17 +40,7 @@ public class MainActivity extends AppCompatActivity implements IBeaconScanTask.N
         tvLog = (TextView) findViewById(R.id.tvLog);
         serviceBL = new Intent(this.context, IBeaconScanService.class);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
+
 
         if(AppPermissions.checkAllPermissions(getApplicationContext())){
             InitializeApp();
@@ -77,12 +67,13 @@ public class MainActivity extends AppCompatActivity implements IBeaconScanTask.N
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case PERMISSION_REQUEST_COARSE_LOCATION: {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(TAG, "coarse location permission granted");
+
+                    InitializeApp();
+
                 } else {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("Functionality limited");
@@ -141,15 +132,22 @@ public class MainActivity extends AppCompatActivity implements IBeaconScanTask.N
     @Override
     protected void onPause() {
         super.onPause();
-        RegisteredBroadcast.unRegisterBluetoothBroadcast(this);
-        context.stopService(this.serviceBL);
+        if(this.serviceBL != null)
+        {
+            RegisteredBroadcast.unRegisterBluetoothBroadcast(this);
+            context.stopService(this.serviceBL);
+        }
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        BluetoothBroadcastReceiver.unBindService();
-        context.stopService(this.serviceBL);
+
+        if(this.serviceBL != null){
+            BluetoothBroadcastReceiver.unBindService();
+            context.stopService(this.serviceBL);
+        }
     }
 
     private void writeLogView(final IBeacon beacon){
