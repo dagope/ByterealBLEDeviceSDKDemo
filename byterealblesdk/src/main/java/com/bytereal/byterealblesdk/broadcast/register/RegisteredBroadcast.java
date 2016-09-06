@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.util.Log;
 
+import com.bytereal.byterealblesdk.BuildConfig;
 import com.bytereal.byterealblesdk.broadcast.receiver.BluetoothBroadcastReceiver;
 
 
@@ -26,9 +27,16 @@ public class RegisteredBroadcast {
     }
 
     public static void unRegisterBluetoothBroadcast(Context context) {
-        if(bluetoothBroadcastReceiver != null){
+        try {
+
             context.unregisterReceiver(bluetoothBroadcastReceiver);
             ILOG("broadcastreceiver unregistered!");
+        }
+        catch (IllegalArgumentException e) {
+            // Check wether we are in debug mode
+            if (BuildConfig.DEBUG) {
+                e.printStackTrace();
+            }
         }
 
     }

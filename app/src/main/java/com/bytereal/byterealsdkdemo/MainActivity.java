@@ -12,6 +12,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.bytereal.byterealblesdk.broadcast.receiver.BluetoothBroadcastReceiver;
@@ -28,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements IBeaconScanTask.N
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     private static final int CODE_PERMISSIONS_GROUP = 1;
     TextView tvLog;
+    ScrollView scrollView;
 
     Context context = null;
     Intent serviceBL = null;
@@ -38,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements IBeaconScanTask.N
         setContentView(R.layout.activity_main);
         context = getApplicationContext();
         tvLog = (TextView) findViewById(R.id.tvLog);
+        scrollView = (ScrollView) findViewById(R.id.scrollView);
         serviceBL = new Intent(this.context, IBeaconScanService.class);
 
 
@@ -170,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements IBeaconScanTask.N
             @Override
             public void run() {
                 tvLog.setText(tvLog.getText()+ "\n\n- "+ msg);
+                scrollView.fullScroll(View.FOCUS_DOWN);
             }
         });
 
